@@ -236,9 +236,11 @@ function getCompletionContext(lineText, character) {
         type: 'section',
         prefix: text.slice(open + 1, position),
         replaceStart: open + 1,
-        replaceEnd: close >= 0 ? close : position
+        replaceEnd: close >= 0 ? close : position,
+        appendBracket: close < 0
       };
     }
+    return null;
   }
 
   const eq = text.indexOf('=');
