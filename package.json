@@ -1,0 +1,186 @@
+{
+  "name": "ra2-ini-support",
+  "displayName": "RA2/YR INI Support",
+  "description": "VS Code support for Red Alert 2 / Yuri's Revenge INI files: section folding, RA2-oriented syntax colors, outline navigation, and safe equals-alignment formatting.",
+  "version": "0.1.0",
+  "publisher": "ShrinkShi",
+  "license": "GPL-3.0-only",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Formatters"
+  ],
+  "keywords": [
+    "ini",
+    "red alert 2",
+    "yuri's revenge",
+    "ra2",
+    "yr",
+    "rules.ini",
+    "art.ini",
+    "modding"
+  ],
+  "main": "./extension.js",
+  "activationEvents": [
+    "onLanguage:ra2ini",
+    "onCommand:ra2Ini.formatDocument"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "ra2ini",
+        "aliases": [
+          "RA2/YR INI",
+          "RA2 INI"
+        ],
+        "extensions": [
+          ".ini"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "ra2ini",
+        "scopeName": "source.ra2ini",
+        "path": "./syntaxes/ra2ini.tmLanguage.json"
+      }
+    ],
+    "commands": [
+      {
+        "command": "ra2Ini.formatDocument",
+        "title": "RA2 INI: 整理并对齐当前文件",
+        "category": "RA2/YR INI"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "ra2Ini.formatDocument",
+          "when": "editorLangId == ra2ini",
+          "group": "1_modification@10"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "RA2/YR INI",
+      "properties": {
+        "ra2Ini.format.alignEquals": {
+          "type": "boolean",
+          "default": true,
+          "scope": "resource",
+          "description": "整理格式时对齐等号。"
+        },
+        "ra2Ini.format.alignmentScope": {
+          "type": "string",
+          "enum": [
+            "block",
+            "section",
+            "document"
+          ],
+          "enumDescriptions": [
+            "仅在连续键值块内对齐；空行、注释、Section 会断开对齐组。适合 rules.ini / art.ini。",
+            "在同一 [Section] 内统一对齐，空行和注释不打断。",
+            "整个文件统一对齐。"
+          ],
+          "default": "block",
+          "scope": "resource",
+          "description": "等号对齐范围。"
+        },
+        "ra2Ini.format.minimumSpacesAroundEquals": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 8,
+          "default": 1,
+          "scope": "resource",
+          "description": "等号左右的最少空格数。对齐时左侧可能自动增加更多空格。"
+        },
+        "ra2Ini.format.normalizeInlineCommentSpacing": {
+          "type": "boolean",
+          "default": true,
+          "scope": "resource",
+          "description": "将值后的行内分号注释整理为至少一个空格后再写 ; 注释。"
+        },
+        "ra2Ini.colors.overrideTheme": {
+          "type": "boolean",
+          "default": true,
+          "scope": "resource",
+          "description": "使用本扩展提供的 RA2 INI 专用颜色覆盖当前主题对对应文本的颜色。关闭后完全交给当前 VS Code 主题。"
+        }
+      }
+    },
+    "colors": [
+      {
+        "id": "ra2Ini.sectionForeground",
+        "description": "RA2 INI 的 [Section] 颜色。",
+        "defaults": {
+          "dark": "#DCDCAA",
+          "light": "#795E26",
+          "highContrast": "#FFFF00",
+          "highContrastLight": "#7F6000"
+        }
+      },
+      {
+        "id": "ra2Ini.keyForeground",
+        "description": "RA2 INI 等号左侧键名颜色。",
+        "defaults": {
+          "dark": "#9CDCFE",
+          "light": "#001080",
+          "highContrast": "#9CDCFE",
+          "highContrastLight": "#001080"
+        }
+      },
+      {
+        "id": "ra2Ini.equalsForeground",
+        "description": "RA2 INI 等号颜色。",
+        "defaults": {
+          "dark": "#C586C0",
+          "light": "#AF00DB",
+          "highContrast": "#FF80FF",
+          "highContrastLight": "#800080"
+        }
+      },
+      {
+        "id": "ra2Ini.valueForeground",
+        "description": "RA2 INI 等号右侧值颜色。",
+        "defaults": {
+          "dark": "#CE9178",
+          "light": "#A31515",
+          "highContrast": "#FFB080",
+          "highContrastLight": "#8B0000"
+        }
+      },
+      {
+        "id": "ra2Ini.commentForeground",
+        "description": "RA2 INI 分号注释颜色。",
+        "defaults": {
+          "dark": "#6A9955",
+          "light": "#008000",
+          "highContrast": "#7CFC00",
+          "highContrastLight": "#006400"
+        }
+      }
+    ],
+    "configurationDefaults": {
+      "[ra2ini]": {
+        "editor.foldingStrategy": "auto",
+        "editor.wordWrap": "off",
+        "editor.bracketPairColorization.enabled": false
+      }
+    }
+  },
+  "scripts": {
+    "test": "node --test",
+    "package": "npx @vscode/vsce package"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ShrinkShi/VSCode-INI-Plugin.git"
+  },
+  "homepage": "https://github.com/ShrinkShi/VSCode-INI-Plugin#readme",
+  "bugs": {
+    "url": "https://github.com/ShrinkShi/VSCode-INI-Plugin/issues"
+  }
+}

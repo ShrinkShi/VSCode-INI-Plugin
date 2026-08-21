@@ -1,0 +1,46 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "RA2/YR INI",
+  "scopeName": "source.ra2ini",
+  "patterns": [
+    { "include": "#comment" },
+    { "include": "#section" },
+    { "include": "#assignment" }
+  ],
+  "repository": {
+    "comment": {
+      "patterns": [
+        {
+          "name": "comment.line.semicolon.ra2ini",
+          "match": "^\\s*;.*$"
+        }
+      ]
+    },
+    "section": {
+      "patterns": [
+        {
+          "match": "^(\\s*)(\\[)([^\\]\\r\\n]+)(\\])(\\s*)(;.*)?$",
+          "captures": {
+            "2": { "name": "punctuation.definition.section.begin.ra2ini" },
+            "3": { "name": "entity.name.section.ra2ini" },
+            "4": { "name": "punctuation.definition.section.end.ra2ini" },
+            "6": { "name": "comment.line.semicolon.ra2ini" }
+          }
+        }
+      ]
+    },
+    "assignment": {
+      "patterns": [
+        {
+          "match": "^([ \\t]*)([^;=\\[\\]\\r\\n][^=\\r\\n]*?)([ \\t]*)(=)([ \\t]*)(.*?)([ \\t]+;.*)?$",
+          "captures": {
+            "2": { "name": "variable.other.key.ra2ini" },
+            "4": { "name": "keyword.operator.assignment.ra2ini" },
+            "6": { "name": "string.unquoted.value.ra2ini" },
+            "7": { "name": "comment.line.semicolon.ra2ini" }
+          }
+        }
+      ]
+    }
+  }
+}
