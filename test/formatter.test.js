@@ -19,6 +19,25 @@ test('section mode aligns across comments and blank lines but not across section
   assert.equal(output, '[One]\nA    = 1\n\n; note\nLong = 2\n[Two]\nX  = 3\nYY = 4');
 });
 
+test('aligns trailing inline comments to the longest formatted value in the group', () => {
+  const input = 'A=1 ; first\nLongKey=LongValue ; second\nC=3';
+  const output = formatIniText(input, {
+    alignmentScope: 'block',
+    alignInlineComments: true
+  });
+  assert.equal(output, 'A       = 1         ; first\nLongKey = LongValue ; second\nC       = 3');
+});
+
+test('can disable trailing comment alignment while still normalizing the gap', () => {
+  const input = 'A=1      ; first\nLongKey=2 ; second';
+  const output = formatIniText(input, {
+    alignmentScope: 'block',
+    alignInlineComments: false,
+    minimumSpacesBeforeInlineComment: 1
+  });
+  assert.equal(output, 'A       = 1 ; first\nLongKey = 2 ; second');
+});
+
 test('keeps order, duplicate keys and comments untouched', () => {
   const input = '[List]\n1=GACNST\n1=GAPOWR\n; 这条注释不能丢\n2=GAREFN';
   const output = formatIniText(input, { alignmentScope: 'block' });

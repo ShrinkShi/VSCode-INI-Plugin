@@ -1,8 +1,8 @@
 {
   "name": "ra2-ini-support",
   "displayName": "RA2/YR INI Support",
-  "description": "VS Code support for Red Alert 2 / Yuri's Revenge INI files: section folding, RA2-oriented syntax colors, outline navigation, and safe equals-alignment formatting.",
-  "version": "0.1.0",
+  "description": "VS Code support for Red Alert 2 / Yuri's Revenge INI files: folding, safe formatting, comment alignment, workspace completion, custom colors, and cross-file Section navigation.",
+  "version": "0.2.0",
   "publisher": "ShrinkShi",
   "license": "GPL-3.0-only",
   "engines": {
@@ -73,6 +73,12 @@
           "scope": "resource",
           "description": "整理格式时对齐等号。"
         },
+        "ra2Ini.format.alignInlineComments": {
+          "type": "boolean",
+          "default": true,
+          "scope": "resource",
+          "description": "整理格式时对齐键值行末尾的 ; 行内注释。对齐范围与 alignmentScope 一致。"
+        },
         "ra2Ini.format.alignmentScope": {
           "type": "string",
           "enum": [
@@ -97,6 +103,14 @@
           "scope": "resource",
           "description": "等号左右的最少空格数。对齐时左侧可能自动增加更多空格。"
         },
+        "ra2Ini.format.minimumSpacesBeforeInlineComment": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 8,
+          "default": 1,
+          "scope": "resource",
+          "description": "行内 ; 注释与前方值之间至少保留的空格数。"
+        },
         "ra2Ini.format.normalizeInlineCommentSpacing": {
           "type": "boolean",
           "default": true,
@@ -106,8 +120,77 @@
         "ra2Ini.colors.overrideTheme": {
           "type": "boolean",
           "default": true,
-          "scope": "resource",
+          "scope": "window",
           "description": "使用本扩展提供的 RA2 INI 专用颜色覆盖当前主题对对应文本的颜色。关闭后完全交给当前 VS Code 主题。"
+        },
+        "ra2Ini.colors.sectionForeground": {
+          "type": "string",
+          "default": "",
+          "scope": "window",
+          "pattern": "^$|^#[0-9A-Fa-f]{6}([0-9A-Fa-f]{2})?$",
+          "description": "自定义 [Section] 的前景色。留空时使用扩展的主题自适应默认颜色。"
+        },
+        "ra2Ini.colors.keyForeground": {
+          "type": "string",
+          "default": "",
+          "scope": "window",
+          "pattern": "^$|^#[0-9A-Fa-f]{6}([0-9A-Fa-f]{2})?$",
+          "description": "自定义等号左侧 Key 的前景色。留空时使用扩展的主题自适应默认颜色。"
+        },
+        "ra2Ini.colors.equalsForeground": {
+          "type": "string",
+          "default": "",
+          "scope": "window",
+          "pattern": "^$|^#[0-9A-Fa-f]{6}([0-9A-Fa-f]{2})?$",
+          "description": "自定义等号 = 的前景色。留空时使用扩展的主题自适应默认颜色。"
+        },
+        "ra2Ini.colors.valueForeground": {
+          "type": "string",
+          "default": "",
+          "scope": "window",
+          "pattern": "^$|^#[0-9A-Fa-f]{6}([0-9A-Fa-f]{2})?$",
+          "description": "自定义等号右侧 Value 的前景色。留空时使用扩展的主题自适应默认颜色。"
+        },
+        "ra2Ini.colors.commentForeground": {
+          "type": "string",
+          "default": "",
+          "scope": "window",
+          "pattern": "^$|^#[0-9A-Fa-f]{6}([0-9A-Fa-f]{2})?$",
+          "description": "自定义分号注释的前景色。留空时使用扩展的主题自适应默认颜色。"
+        },
+        "ra2Ini.completion.enabled": {
+          "type": "boolean",
+          "default": true,
+          "scope": "resource",
+          "description": "启用基于工作区所有 INI 文件的 Section / Key / Value 补全。"
+        },
+        "ra2Ini.completion.includeSectionsInValues": {
+          "type": "boolean",
+          "default": true,
+          "scope": "resource",
+          "description": "在等号右侧的 Value 补全中同时提供工作区 [Section] 名称，用于对象引用。"
+        },
+        "ra2Ini.completion.maxItems": {
+          "type": "integer",
+          "minimum": 20,
+          "maximum": 1000,
+          "default": 200,
+          "scope": "resource",
+          "description": "单次代码补全最多返回的候选数量。"
+        },
+        "ra2Ini.index.maxFiles": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20000,
+          "default": 5000,
+          "scope": "window",
+          "description": "工作区 INI 记忆索引最多扫描的文件数。"
+        },
+        "ra2Ini.index.excludeGlob": {
+          "type": "string",
+          "default": "**/{.git,node_modules}/**",
+          "scope": "window",
+          "description": "建立工作区 INI 记忆索引时排除的 glob。"
         }
       }
     },
@@ -167,7 +250,14 @@
       "[ra2ini]": {
         "editor.foldingStrategy": "auto",
         "editor.wordWrap": "off",
-        "editor.bracketPairColorization.enabled": false
+        "editor.bracketPairColorization.enabled": false,
+        "editor.tabCompletion": "on",
+        "editor.quickSuggestions": {
+          "other": "on",
+          "comments": "off",
+          "strings": "on"
+        },
+        "editor.suggestOnTriggerCharacters": true
       }
     }
   },

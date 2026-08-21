@@ -116,18 +116,24 @@ function formatIniText(text, options = {}) {
   const eol = options.eol || (text.includes('\r\n') ? '\r\n' : '\n');
   const tabSize = Number.isInteger(options.tabSize) && options.tabSize > 0 ? options.tabSize : 4;
   const alignEquals = options.alignEquals !== false;
+  const alignInlineComments = options.alignInlineComments !== false;
   const alignmentScope = ['block', 'section', 'document'].includes(options.alignmentScope)
     ? options.alignmentScope
     : 'block';
   const minimumSpaces = Math.max(1, Math.min(8, Number(options.minimumSpacesAroundEquals) || 1));
+  const minimumCommentSpaces = Math.max(
+    1,
+    Math.min(8, Number(options.minimumSpacesBeforeInlineComment) || 1)
+  );
   const normalizeInlineCommentSpacing = options.normalizeInlineCommentSpacing !== false;
 
   const lines = text.split(/\r?\n/);
   const parsed = lines.map(parseAssignment);
   const leftPadding = new Array(lines.length).fill(minimumSpaces);
+  const commentPadding = new Array(lines.length).fill(null);
+  const groups = collectAlignmentGroups(lines, parsed, alignmentScope);
 
   if (alignEquals) {
-    const groups = collectAlignmentGroups(lines, parsed, alignmentScope);
     for (const group of groups) {
       let maxWidth = 0;
       for (const index of group) {
@@ -142,18 +148,48 @@ function formatIniText(text, options = {}) {
     }
   }
 
+  const baseLineFor = index => {
+    const item = parsed[index];
+    const leftSpaces = ' '.repeat(leftPadding[index]);
+    const rightSpaces = ' '.repeat(minimumSpaces);
+    return `${item.indent}${item.key}${leftSpaces}=${rightSpaces}${item.value}`;
+  };
+
+  if (alignInlineComments) {
+    for (const group of groups) {
+      if (!group.some(index => parsed[index].comment)) continue;
+
+      let maxValueEnd = 0;
+      for (const index of group) {
+        maxValueEnd = Math.max(maxValueEnd, visualWidth(baseLineFor(index), tabSize));
+      }
+
+      for (const index of group) {
+        if (!parsed[index].comment) continue;
+        const valueEnd = visualWidth(baseLineFor(index), tabSize);
+        commentPadding[index] = Math.max(
+          minimumCommentSpaces,
+          maxValueEnd - valueEnd + minimumCommentSpaces
+        );
+      }
+    }
+  }
+
   const formatted = lines.map((line, index) => {
     const item = parsed[index];
     if (!item) return line;
 
-    const leftSpaces = ' '.repeat(leftPadding[index]);
-    const rightSpaces = ' '.repeat(minimumSpaces);
-    let result = `${item.indent}${item.key}${leftSpaces}=${rightSpaces}${item.value}`;
+    let result = baseLineFor(index);
 
     if (item.comment) {
-      const gap = normalizeInlineCommentSpacing
-        ? ' '.repeat(minimumSpaces)
-        : (item.commentSpacing || ' '.repeat(minimumSpaces));
+      let gap;
+      if (commentPadding[index] !== null) {
+        gap = ' '.repeat(commentPadding[index]);
+      } else if (normalizeInlineCommentSpacing) {
+        gap = ' '.repeat(minimumCommentSpaces);
+      } else {
+        gap = item.commentSpacing || ' '.repeat(minimumCommentSpaces);
+      }
       result += `${gap}${item.comment}`;
     }
 
@@ -168,5 +204,6 @@ module.exports = {
   parseAssignment,
   isSection,
   isFullComment,
-  visualWidth
+  visualWidth,
+  collectAlignmentGroups
 };
