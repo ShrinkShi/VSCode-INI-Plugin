@@ -1,5 +1,8 @@
 # VSCode-INI-Plugin
 
+[![Build and Release VSIX](https://github.com/ShrinkShi/VSCode-INI-Plugin/actions/workflows/release.yml/badge.svg)](https://github.com/ShrinkShi/VSCode-INI-Plugin/actions/workflows/release.yml)
+[![GitHub Release](https://img.shields.io/github/v/release/ShrinkShi/VSCode-INI-Plugin)](https://github.com/ShrinkShi/VSCode-INI-Plugin/releases)
+
 面向《命令与征服：红色警戒 2 / 尤里的复仇》MOD 开发的 VS Code INI 语言扩展。
 
 项目重点不是做一个“通用 INI 美化器”，而是改善 `rules.ini`、`rulesmd.ini`、`art.ini`、`artmd.ini`、`ai.ini`、`aimd.ini` 等大型 Westwood INI 文件在 VS Code 中的编辑体验，并尽量避免格式化工具破坏原有条目顺序、重复键和人工注释布局。
