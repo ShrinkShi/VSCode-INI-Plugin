@@ -120,7 +120,7 @@
         "ra2Ini.colors.overrideTheme": {
           "type": "boolean",
           "default": true,
-          "scope": "resource",
+          "scope": "window",
           "description": "使用本扩展提供的 RA2 INI 专用颜色覆盖当前主题对对应文本的颜色。关闭后完全交给当前 VS Code 主题。"
         },
         "ra2Ini.colors.sectionForeground": {
