@@ -45,8 +45,10 @@ function formatDocument(document, tabSize = 4) {
 }
 
 function colorSetting(name, themeColorId) {
-  const cfg = vscode.workspace.getConfiguration('ra2Ini.colors');
-  const custom = String(cfg.get(name, '') || '').trim();
+  // Read from the extension root so nested settings such as
+  // ra2Ini.colors.sectionForeground are resolved consistently.
+  const cfg = vscode.workspace.getConfiguration('ra2Ini');
+  const custom = String(cfg.get(`colors.${name}`, '') || '').trim();
   return custom || new vscode.ThemeColor(themeColorId);
 }
 
@@ -140,7 +142,7 @@ function computeDecorationsForLine(document, lineNumber, buckets) {
 
 function applyVisibleColorDecorations(editor, decorations) {
   if (!editor || editor.document.languageId !== LANGUAGE_ID) return;
-  const enabled = vscode.workspace.getConfiguration('ra2Ini.colors').get('overrideTheme', true);
+  const enabled = vscode.workspace.getConfiguration('ra2Ini').get('colors.overrideTheme', true);
 
   if (!enabled) {
     for (const decoration of Object.values(decorations)) {
@@ -528,33 +530,53 @@ function activate(context) {
     })
   );
 
-  let decorationTimer;
+  const decorationTimers = new Map();
   const scheduleDecorationRefresh = (editor = vscode.window.activeTextEditor) => {
-    clearTimeout(decorationTimer);
-    decorationTimer = setTimeout(() => applyVisibleColorDecorations(editor, decorations), 40);
+    if (!editor || editor.document.languageId !== LANGUAGE_ID) return;
+    const key = editor.document.uri.toString();
+    const previous = decorationTimers.get(key);
+    if (previous) clearTimeout(previous);
+    const timer = setTimeout(() => {
+      decorationTimers.delete(key);
+      applyVisibleColorDecorations(editor, decorations);
+    }, 40);
+    decorationTimers.set(key, timer);
+  };
+
+  const refreshVisibleIniEditors = () => {
+    for (const editor of vscode.window.visibleTextEditors) {
+      if (editor.document.languageId === LANGUAGE_ID) scheduleDecorationRefresh(editor);
+    }
   };
 
   const recreateDecorations = () => {
     for (const item of Object.values(decorations)) item.dispose();
     decorations = createColorDecorations();
     for (const item of Object.values(decorations)) context.subscriptions.push(item);
-    scheduleDecorationRefresh();
+    refreshVisibleIniEditors();
   };
 
   context.subscriptions.push(
     vscode.window.onDidChangeActiveTextEditor(editor => scheduleDecorationRefresh(editor)),
     vscode.window.onDidChangeTextEditorVisibleRanges(event => scheduleDecorationRefresh(event.textEditor)),
     vscode.workspace.onDidChangeTextDocument(event => {
-      const editor = vscode.window.activeTextEditor;
-      if (editor && event.document === editor.document) scheduleDecorationRefresh(editor);
+      for (const editor of vscode.window.visibleTextEditors) {
+        if (event.document === editor.document) scheduleDecorationRefresh(editor);
+      }
     }),
     vscode.workspace.onDidChangeConfiguration(event => {
       if (event.affectsConfiguration('ra2Ini.colors')) recreateDecorations();
     }),
-    { dispose: () => clearTimeout(decorationTimer) }
+    vscode.window.onDidChangeActiveColorTheme(() => recreateDecorations()),
+    {
+      dispose: () => {
+        for (const timer of decorationTimers.values()) clearTimeout(timer);
+        decorationTimers.clear();
+      }
+    }
   );
 
-  scheduleDecorationRefresh();
+  refreshVisibleIniEditors();
 }
 
 function deactivate() {}
