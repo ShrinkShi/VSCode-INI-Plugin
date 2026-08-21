@@ -2,7 +2,7 @@
   "name": "ra2-ini-support",
   "displayName": "RA2/YR INI Support",
   "description": "VS Code support for Red Alert 2 / Yuri's Revenge INI files: folding, safe formatting, comment alignment, workspace completion, custom colors, and cross-file Section navigation.",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "publisher": "ShrinkShi",
   "license": "GPL-3.0-only",
   "engines": {
@@ -125,10 +125,10 @@
         },
         "ra2Ini.colors.sectionForeground": {
           "type": "string",
-          "default": "",
+          "default": "#8B00BD",
           "scope": "window",
           "pattern": "^$|^#[0-9A-Fa-f]{6}([0-9A-Fa-f]{2})?$",
-          "description": "自定义 [Section] 的前景色。留空时使用扩展的主题自适应默认颜色。"
+          "description": "自定义 [Section] 的前景色。默认 #8B00BD；留空时使用扩展颜色主题值。"
         },
         "ra2Ini.colors.keyForeground": {
           "type": "string",
@@ -139,10 +139,10 @@
         },
         "ra2Ini.colors.equalsForeground": {
           "type": "string",
-          "default": "",
+          "default": "#FF0000",
           "scope": "window",
           "pattern": "^$|^#[0-9A-Fa-f]{6}([0-9A-Fa-f]{2})?$",
-          "description": "自定义等号 = 的前景色。留空时使用扩展的主题自适应默认颜色。"
+          "description": "自定义等号 = 的前景色。默认 #FF0000；留空时使用扩展颜色主题值。"
         },
         "ra2Ini.colors.valueForeground": {
           "type": "string",
@@ -199,10 +199,10 @@
         "id": "ra2Ini.sectionForeground",
         "description": "RA2 INI 的 [Section] 颜色。",
         "defaults": {
-          "dark": "#DCDCAA",
-          "light": "#795E26",
-          "highContrast": "#FFFF00",
-          "highContrastLight": "#7F6000"
+          "dark": "#8B00BD",
+          "light": "#8B00BD",
+          "highContrast": "#8B00BD",
+          "highContrastLight": "#8B00BD"
         }
       },
       {
@@ -219,10 +219,10 @@
         "id": "ra2Ini.equalsForeground",
         "description": "RA2 INI 等号颜色。",
         "defaults": {
-          "dark": "#C586C0",
-          "light": "#AF00DB",
-          "highContrast": "#FF80FF",
-          "highContrastLight": "#800080"
+          "dark": "#FF0000",
+          "light": "#FF0000",
+          "highContrast": "#FF0000",
+          "highContrastLight": "#FF0000"
         }
       },
       {
