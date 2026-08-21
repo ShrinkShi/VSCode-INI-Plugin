@@ -42,7 +42,7 @@ test('workspace completion learns keys and values for the same key', () => {
 
 test('completion context distinguishes section, key and value positions', () => {
   assert.deepEqual(getCompletionContext('[Gen', 4), {
-    type: 'section', prefix: 'Gen', replaceStart: 1, replaceEnd: 4, appendBracket: true
+    type: 'section', prefix: 'Gen', replaceStart: 1, replaceEnd: 4
   });
   assert.deepEqual(getCompletionContext('  Prim', 6), {
     type: 'key', prefix: 'Prim', replaceStart: 2, replaceEnd: 6, appendEquals: true
@@ -54,7 +54,7 @@ test('completion context distinguishes section, key and value positions', () => 
 
 test('section completion does not duplicate an existing closing bracket', () => {
   assert.deepEqual(getCompletionContext('[Gen]', 4), {
-    type: 'section', prefix: 'Gen', replaceStart: 1, replaceEnd: 4, appendBracket: false
+    type: 'section', prefix: 'Gen', replaceStart: 1, replaceEnd: 5
   });
   assert.equal(getCompletionContext('[General] ; note', 12), null);
 });
